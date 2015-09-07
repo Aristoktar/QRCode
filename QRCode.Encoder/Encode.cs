@@ -491,30 +491,51 @@ namespace QRCode.Encoder
 			}
 			return XORresult;
 		}
-		private static void ApplyMask(int size,MaskPatterns maskPattern, ref bool[,] matrix, Color[,] matrixOfFilled)
+		private static void ApplyMask(int size,MaskPatterns maskPattern,ref bool[,] matrix, Color[,] matrixOfFilled)
 		{
-			for (int i = 0; i < size; i++)
+			for (int row = 1; row <= size; row++)
 			{
-				for (int j = 0; j < size; j++)
+				for (int col = 1; col <= size; col++)
 				{
-					if ( matrixOfFilled[i , j] == Color.Aquamarine ) {
+					if ( matrixOfFilled[row-1 , col-1] == Color.Aquamarine ) {
+						//i==row, j== column
+						if (col==11&& row==1)
+						{
+							int p = 33;
+						}
 						switch (maskPattern)
 						{
 							case MaskPatterns.Pattern0:
-								if ((i + j)%2 == 0)
-									matrix[i, j] = !matrix[i, j];
+								if ((row + col)%2 == 0)
+									matrix[row-1, col-1] = !matrix[row-1, col-1];
 								break;
 							case MaskPatterns.Pattern1:
-								if (i%2 == 0)
-									matrix[i, j] = !matrix[i, j];
+								if (row%2 == 0)
+									matrix[row - 1 , col - 1] = !matrix[row - 1 , col - 1];
 								break;
 							case MaskPatterns.Pattern2:
-								if ( j % 2 == 0 )
-									matrix[i , j] = !matrix[i , j];
+								if ( col % 2 == 0 )
+									matrix[row - 1 , col - 1] = !matrix[row - 1 , col - 1];
 								break;
 							case MaskPatterns.Pattern3:
-								if ( ( i + j ) % 3 == 0 )
-									matrix[i , j] = !matrix[i , j];
+								if ( ( row + col ) % 3 == 0 )
+									matrix[row - 1 , col - 1] = !matrix[row - 1 , col - 1];
+								break;
+							case MaskPatterns.Pattern4:
+								if ( (int)((Math.Floor((double)row/2)+Math.Floor((double)col/3))%2) == 0 )
+									matrix[row - 1 , col - 1] = !matrix[row - 1 , col - 1];
+								break;
+							case MaskPatterns.Pattern5:
+								if ( ((row * col) % 2) + ((row * col) % 3) == 0 )
+									matrix[row - 1 , col - 1] = !matrix[row - 1 , col - 1];
+								break;
+							case MaskPatterns.Pattern6:
+								if ( ( ((row * col) % 2) + ((row * col) % 3) ) % 2 == 0 )
+									matrix[row - 1 , col - 1] = !matrix[row - 1 , col - 1];
+								break;
+							case MaskPatterns.Pattern7:
+								if (( ((row + col) % 2) + ((row * col) % 3) ) %   2  == 0 )
+									matrix[row - 1 , col - 1] = !matrix[row - 1 , col - 1];
 								break;
 							default:
 								throw new NotImplementedException();
@@ -525,7 +546,7 @@ namespace QRCode.Encoder
 				}
 			}
 		}
-		public static Bitmap DrawBitmap(int version, bool[] data, bool[] formatInfoData, int resolutionSize, MaskPatterns maskPattern = MaskPatterns.Pattern0)
+		public static Bitmap DrawBitmap(int version, bool[] data, bool[] formatInfoData, int resolutionSize, MaskPatterns maskPattern)
 		{
 			int size = 21 + (version - 1)*4;
 			int thickness = resolutionSize/size;
@@ -743,19 +764,19 @@ namespace QRCode.Encoder
 			{
 				for (int i = 0; i < 6; i++)
 				{
-					matrixOfData[8, i] = formatInfoData[i];
-					matrixOfData[size - 1 - i, 8] = formatInfoData[i];
+					matrixOfData[8 , i] = formatInfoData[14 - i];
+					matrixOfData[size - 1 - i , 8] = formatInfoData[14 - i];
 				}
-				matrixOfData[8 , 7] = formatInfoData[6];
+				matrixOfData[8 , 7] = formatInfoData[8];
 				matrixOfData[8 , 8] = formatInfoData[7];
-				matrixOfData[7 , 8] = formatInfoData[8];
-				matrixOfData[size - 7 , 8] = formatInfoData[6];
+				matrixOfData[7 , 8] = formatInfoData[6];
+				matrixOfData[size - 7 , 8] = formatInfoData[8];
 				matrixOfData[size - 8 , 8] = formatInfoData[7];
-				matrixOfData[8 , size-7] = formatInfoData[8];
+				matrixOfData[8 , size-7] = formatInfoData[6];
 				for (int i = 9; i < 15; i++)
 				{
-					matrixOfData[5-(i-9) , 8] = formatInfoData[i];
-					matrixOfData[8 , size-6+(i-9)] = formatInfoData[i];
+					matrixOfData[5 - ( i - 9 ) , 8] = formatInfoData[14 - i];
+					matrixOfData[8 , size - 6 + ( i - 9 )] = formatInfoData[14 - i];
 				}
 			}
 
@@ -777,8 +798,8 @@ namespace QRCode.Encoder
 					Color color = matrixOfFilled[i - 5 , j - 5];
 					g.FillRectangle ( new SolidBrush ( color ) , i * thickness , j * thickness , thickness , thickness );
 
-					if ( matrixOfData[i - 5 , j - 5] ) {
-						g.FillRectangle ( Brushes.Black , i * thickness , j * thickness , thickness , thickness );
+					if ( matrixOfData[i - 5 , j - 5]) {
+						g.FillRectangle ( new SolidBrush (Color.Black) , i * thickness , j * thickness , thickness , thickness );
 
 					}
 					else {
@@ -800,7 +821,7 @@ namespace QRCode.Encoder
 			int pixel = 0;
 			bool[] fullData = new bool[0];
 		    var formatInfoData = FormatInfoStringsList.GetInfoString(version, errorCorrectionLvl, maskPattern);
-			return DrawBitmap ( version , errCorrKeyWords , formatInfoData ,1000);
+			return DrawBitmap ( version , errCorrKeyWords , formatInfoData ,1000,maskPattern);
 		}
     }
 }
