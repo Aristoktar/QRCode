@@ -117,7 +117,12 @@ namespace QRCode.WinForms {
 			this.comboBoxMaskPattern.FormattingEnabled = true;
 			this.comboBoxMaskPattern.Items.AddRange(new object[] {
             MaskPatterns.Pattern0,
-			MaskPatterns.Pattern1});
+			MaskPatterns.Pattern1,
+			MaskPatterns.Pattern2,
+			MaskPatterns.Pattern3,
+			MaskPatterns.Pattern4,
+			MaskPatterns.Pattern5,
+			MaskPatterns.Pattern7} );
 			this.comboBoxMaskPattern.Location = new System.Drawing.Point(321, 256);
 			this.comboBoxMaskPattern.Name = "comboBoxMaskPattern";
 			this.comboBoxMaskPattern.Size = new System.Drawing.Size(121, 21);
